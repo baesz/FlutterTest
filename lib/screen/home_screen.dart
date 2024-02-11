@@ -1,73 +1,56 @@
 // home_screen.dart
+// 홈버튼 구현
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
-import 'dart:async';
+class HomeScreen extends StatelessWidget {
+  WebViewController? controller;
+  // controller의 기본 상태가 null인 상태로 선언
 
-// PageController
-
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  // PageController 설정
-  final PageController pageController = PageController();
-
-  @override
-  void initState() {
-    super.initState();
-    Timer.periodic(
-      Duration(seconds: 3),
-      (timer) {
-        // pageController 동작 설정
-
-        // 현재 페이지 가져오기
-        int? np = pageController.page?.toInt();
-
-        if (np == null) {
-          // 페이지값이 없을 경우
-          return;
-        }
-
-        if (np == 4) {
-          // 마지막 페이지일 경우
-          // 첫 페이지로 넘어가도록 설정
-          np = 0;
-        } else {
-          // 다음 페이지 설정
-          np++;
-        }
-
-        pageController.animateToPage(
-          // 페이지 변경
-          np, // 이동할 페이지 int값
-          duration: Duration(milliseconds: 500),
-          curve: Curves.ease, // 애니메이션 작동 방식
-        );
-      },
-    );
-  }
+  HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
-
     return Scaffold(
-      body: PageView(
-        // PageView에 컨트롤러 설정
-        controller: pageController,
-        children: [1, 2, 3, 4, 5]
-            .map(
-              (n) => Image.asset(
-                'assets/img/image_$n.png',
-                fit: BoxFit.cover,
-              ),
-            )
-            .toList(),
+      // AppBar
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        titleTextStyle: TextStyle(
+          fontSize: 24.0,
+          color: Colors.white,
+        ),
+        centerTitle: true,
+        title: Text(
+          'UnderTale',
+        ),
+        actions: [
+          IconButton(
+              // 아이콘 버튼 형식
+              onPressed: () {
+                // 아이콘 눌렀을 시 실행하는 콜백 함수
+
+                if (controller != null) {
+                  // 입력된 controller가 있을 경우 - 웹뷰가 실행된 경우
+
+                  controller!.loadUrl('https://blog.naver.com/13aesz');
+                  // 이하 링크로 이동
+                  // controller가 null이 될 수 있는 변수이기 때문에 ! 입력 필요
+                }
+              },
+              icon: Icon(
+                Icons.home,
+              ))
+        ],
+      ),
+
+      // WebView
+      body: WebView(
+        initialUrl: 'https://blog.naver.com/13aesz',
+        javascriptMode: JavascriptMode.unrestricted,
+        onWebViewCreated: (WebViewController controller) {
+          this.controller = controller;
+        },
       ),
     );
   }
